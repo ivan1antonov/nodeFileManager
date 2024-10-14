@@ -73,9 +73,9 @@ function listDirectory() {
 function readFile(fileName) {
   const filePath = path.join(process.cwd(), fileName);
   const stream = fs.createReadStream(filePath, 'utf-8');
-  
+
   stream.on('data', (chunk) => console.log(chunk));
-  stream.on('error', () => console.log('Operation failed'));
+  stream.on('error', (err) => console.log(`Operation failed: ${err.message}`));
 }
 
 function createFile(fileName) {
@@ -164,7 +164,7 @@ function compressFile(source, destination) {
 
 function decompressFile(source, destination) {
 
-  
+
   const input = fs.createReadStream(source);
   const output = fs.createWriteStream(destination);
   const brotli = zlib.createBrotliDecompress();
