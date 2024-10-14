@@ -87,3 +87,33 @@ function copyFile(source, destination) {
     }
   });
 }
+
+function handleCommand(command) {
+  const [cmd, ...args] = command.trim().split(' ');
+
+  switch (cmd) {
+    case 'cd':
+      changeDirectory(args[0]);
+      break;
+    case 'ls':
+      listDirectory();
+      break;
+    case 'cat':
+      readFile(args[0]);
+      break;
+    case 'add':
+      createFile(args[0]);
+      break;
+    case 'rm':
+      deleteFile(args[0]);
+      break;
+    case 'cp':
+      copyFile(args[0], args[1]);
+      break;
+    case '.exit':
+      console.log(`Thank you for using File Manager, ${userName}, goodbye!`);
+      process.exit();
+    default:
+      console.log('Invalid input');
+  }
+}
