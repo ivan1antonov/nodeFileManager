@@ -23,3 +23,18 @@ process.on('exit', (code) => {
 function printCurrentDirectory() {
   console.log(`You are currently in ${process.cwd()}`);
 }
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+
+function changeDirectory(newPath) {
+  try {
+    process.chdir(newPath);
+    printCurrentDirectory();
+  } catch (error) {
+    console.log('Operation failed');
+  }
+}
