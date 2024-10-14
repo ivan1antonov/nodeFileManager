@@ -89,33 +89,40 @@ function createFile(fileName) {
   });
 }
 
-function deleteFile(fileName) {
-  const filePath = path.join(process.cwd(), fileName);
+function deleteFile(filePath) {
   fs.unlink(filePath, (err) => {
-    if (err) {
-      console.log('Operation failed');
-    } else {
-      console.log(`${fileName} was deleted`);
-    }
+    if (err) console.log('Operation failed');
+    else console.log(`${filePath} was deleted`);
   });
 }
 
+function renameFile(filePath, newFileName) {
+  const newPath = path.join(path.dirname(filePath), newFileName);
+  fs.rename(filePath, newPath, (err) => {
+    if (err) console.log('Operation failed');
+    else console.log(`${filePath} was renamed to ${newFileName}`);
+  });
+}
+
+
 function copyFile(source, destination) {
-  const srcPath = path.join(process.cwd(), source);
-  const destPath = path.join(process.cwd(), destination, path.basename(source));
-  
-  const readStream = fs.createReadStream(srcPath);
-  const writeStream = fs.createWriteStream(destPath);
+  if (!fs.existsSync(source)) {
+    console.log('Source file does not exist');
+    return;
+  }
+  if (!fs.existsSync(destination)) {
+    console.log('Destination directory does not exist');
+    return;
+  }
+
+  const readStream = fs.createReadStream(source);
+  const writeStream = fs.createWriteStream(path.join(destination, path.basename(source)));
 
   readStream.pipe(writeStream);
 
-  writeStream.on('finish', () => {
-    console.log(`${source} was copied to ${destination}`);
-  });
-
-  writeStream.on('error', () => {
-    console.log('Operation failed');
-  });
+  writeStream.on('finish', () => console.log(`${source} was copied to ${destination}`));
+  writeStream.on('error', () => console.log('Operation failed'));
+  readStream.on('error', () => console.log('Operation failed'));
 }
 
 function moveFile(source, destination) {
@@ -139,6 +146,11 @@ function hashFile(filePath) {
 }
 
 function compressFile(source, destination) {
+  if (!fs.existsSync(source) || !fs.existsSync(destination)) {
+    console.log('Source file or destination directory does not exist');
+    return;
+  }
+
   const input = fs.createReadStream(source);
   const output = fs.createWriteStream(destination);
   const brotli = zlib.createBrotliCompress();
@@ -151,6 +163,8 @@ function compressFile(source, destination) {
 }
 
 function decompressFile(source, destination) {
+
+  
   const input = fs.createReadStream(source);
   const output = fs.createWriteStream(destination);
   const brotli = zlib.createBrotliDecompress();
@@ -213,6 +227,9 @@ function handleCommand(command) {
     case 'cp':
       copyFile(args[0], args[1]);
       break;
+    case 'rn':
+      renameFile(args[0], args[1]);
+      break;
     case 'mv':
       moveFile(args[0], args[1]);
       break;
@@ -231,8 +248,10 @@ function handleCommand(command) {
     case '.exit':
       console.log(`Thank you for using File Manager, ${userName}, goodbye!`);
       process.exit();
+      break;
     default:
       console.log('Invalid input');
+      break;
   }
 }
 
