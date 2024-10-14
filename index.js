@@ -1,6 +1,7 @@
 import fs from 'fs';
 import {path} from 'path';
 import { readline } from 'readline';
+import { crypto } from 'crypto';
 
 const args = process.argv.slice(2);
 const isUserName = args.find((el) => el.startsWith('--username='));
@@ -85,6 +86,21 @@ function copyFile(source, destination) {
     } else {
       console.log(`${source} was copied to ${destination}`);
     }
+  });
+}
+
+function hashFile(filePath) {
+  const absolutePath = path.resolve(filePath);
+  const hash = crypto.createHash('sha256');
+  const stream = fs.createReadStream(absolutePath);
+
+  stream.on('data', (data) => hash.update(data));
+  stream.on('end', () => {
+      console.log(`Hash: ${hash.digest('hex')}`);
+  });
+
+  stream.on('error', (err) => {
+      console.error('Error hashing file:', err.message);
   });
 }
 
