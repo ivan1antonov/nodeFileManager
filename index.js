@@ -1,16 +1,25 @@
-import fs from 'fs/promises';
-import { join, dirname } from 'path';
-// import { fileURLToPath } from 'url';
-
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
-
-// const fileName = path.join(__dirname, '')
-
 const args = process.argv.slice(2);
-const isUserName = args.filter((el) => el.startsWith('--'));
+const isUserName = args.find((el) => el.startsWith('--username='));
+
+let userName = '';
 if (isUserName) {
   let partName = isUserName.split('=');
-  let name = partName[1];
-  console.log(`Welcome to the File Manager, ${name}!`);
+  userName = partName[1];
+  console.log(`Welcome to the File Manager, ${userName}!`);
+  printCurrentDirectory();
+} else {
+  console.log('User name was not write!');
+}
+
+process.on('SIGINT', () => {
+  console.log(`Thank you for using File Manager, ${userName}, goodbye`);
+  process.exit();
+});
+
+process.on('exit', (code) => {
+  console.log(`Process was exited with code ${code}`);
+});
+
+function printCurrentDirectory() {
+  console.log(`You are currently in ${process.cwd()}`);
 }
